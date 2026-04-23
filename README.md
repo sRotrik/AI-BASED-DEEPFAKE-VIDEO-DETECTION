@@ -4,12 +4,11 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red?logo=pytorch)
-![HuggingFace](https://img.shields.io/badge/HuggingFace-Transformers-yellow?logo=huggingface)
+
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Val AUC](https://img.shields.io/badge/Val%20AUC-0.8806-brightgreen)
 
-**B.Tech Final Year Project | SRM Institute of Science and Technology, Kattankulathur**  
-**Course: 21CSP302L | Department: CTECH | Batch: B305 | Semester 6 (2025–2026)**
+
 
 </div>
 
