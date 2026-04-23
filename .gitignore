@@ -1,0 +1,67 @@
+# ─────────────────────────────────────────────────────────────
+# AI-Based Deepfake Video Detection — .gitignore
+# ─────────────────────────────────────────────────────────────
+
+# ── Virtual Environment ───────────────────────────────────────
+venv/
+venv311/
+.venv/
+env/
+ENV/
+
+# ── Model Checkpoints (large .pth files — use Git LFS or share separately) ──
+checkpoints/*.pth
+checkpoints_backup/
+# Keep the folder and the last_checkpoint.txt and tb_logs
+!checkpoints/last_checkpoint.txt
+!checkpoints/.gitkeep
+
+# ── TensorBoard Logs (regeneratable) ─────────────────────────
+checkpoints/tb_logs/
+
+# ── Dataset — FaceForensics++ (raw videos, too large for GitHub) ──
+FaceForensics++/
+
+# ── Processed Dataset Files (.npy face clips, records.json is OK) ──
+data/processed/DeepFakeDetection/
+data/processed/Deepfakes/
+data/processed/Face2Face/
+data/processed/FaceShifter/
+data/processed/FaceSwap/
+data/processed/NeuralTextures/
+data/processed/original/
+*.npy
+
+# ── Python cache ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyc
+
+# ── Jupyter Notebooks checkpoints ────────────────────────────
+.ipynb_checkpoints/
+
+# ── OS files ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE / Editor ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ── Temp upload files ────────────────────────────────────────
+/tmp/
+deepfake_uploads/
+
+# ── Large inference output images (optional — comment out to include) ──
+# results/inference_faces.png
+# results/inference_diffs.png
+
+# ── Environment variables / secrets ──────────────────────────
+.env
+*.env
+secrets.yaml

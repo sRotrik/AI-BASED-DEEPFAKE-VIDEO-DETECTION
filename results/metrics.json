@@ -1,0 +1,34 @@
+{
+  "auc": 0.9094,
+  "auc_pct": 90.94,
+  "balanced_accuracy": 0.8306,
+  "f1": 0.876,
+  "precision": 0.9274,
+  "recall": 0.83,
+  "average_precision": 0.9606,
+  "eer": 0.1694,
+  "raw_accuracy": 0.8303,
+  "optimal_threshold": 0.815,
+  "confusion_matrix": [
+    [
+      64,
+      13
+    ],
+    [
+      34,
+      166
+    ]
+  ],
+  "tp": 166,
+  "fp": 13,
+  "tn": 64,
+  "fn": 34,
+  "per_method_auc": {
+    "DeepFakeDetection": 99.15,
+    "Deepfakes": 96.1,
+    "Face2Face": 90.39,
+    "FaceShifter": 88.55,
+    "FaceSwap": 89.35,
+    "NeuralTextures": 83.7
+  }
+}

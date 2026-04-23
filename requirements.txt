@@ -1,0 +1,34 @@
+# Deepfake Detection — Requirements
+# Install with: pip install -r requirements.txt
+# For CUDA 12.1: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# Transformer models
+timm>=0.9.0
+transformers>=4.35.0
+
+# Face detection
+facenet-pytorch>=2.5.3
+
+# Video + image processing
+opencv-python-headless>=4.8.0
+albumentations>=1.3.1
+
+# ML utilities
+scikit-learn>=1.3.0
+numpy>=1.24.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Training utilities
+tqdm>=4.65.0
+pyyaml>=6.0
+tensorboard>=2.13.0
+
+# Optional: experiment tracking
+# wandb>=0.15.0

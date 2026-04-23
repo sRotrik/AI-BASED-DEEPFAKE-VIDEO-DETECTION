@@ -1,0 +1,27 @@
+{
+  "baseline": {
+    "auc": 0.9093,
+    "auc_pct": 90.93,
+    "balanced_accuracy": 0.8376,
+    "f1": 0.8946,
+    "precision": 0.9206,
+    "recall": 0.87,
+    "average_precision": 0.9607,
+    "eer": 0.1834,
+    "optimal_threshold": 0.76
+  },
+  "tta": {
+    "auc": 0.9018,
+    "auc_pct": 90.18,
+    "balanced_accuracy": 0.8291,
+    "f1": 0.905,
+    "precision": 0.905,
+    "recall": 0.905,
+    "average_precision": 0.9536,
+    "eer": 0.1834,
+    "optimal_threshold": 0.755
+  },
+  "platt": {},
+  "platt_tta": {},
+  "ensemble": {}
+}

@@ -1,0 +1,45 @@
+data:
+  root_dir: "D:/SROTRIK/deepfake_detection/FaceForensics++"
+  output_dir: "./data/processed"
+  num_frames: 16
+  image_size: 224
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  n_real: 1000
+  n_fake: 6000
+  class_weight_real: 3.5
+  class_weight_fake: 0.583
+
+model:
+  embed_dim: 512
+  proj_dim: 128
+  dropout: 0.3
+  use_supcon: true
+  supcon_alpha: 0.2          # was 0.3 — CE gets 80% weight now
+  supcon_temperature: 0.15   # was 0.1 — slightly looser clustering
+  focal_alpha: 0.75
+  use_focal_loss: true
+  focal_gamma: 0.0
+
+training:
+  batch_size: 8
+  epochs: 50                 # was 30 — continue learning
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  grad_clip: 1.0
+  mixed_precision: true
+  accumulate_grad_steps: 4
+  use_weighted_sampler: true
+  use_weighted_loss: true
+
+hardware:
+  num_workers: 4
+  pin_memory: true
+  device: "cuda"
+
+logging:
+  save_dir: "./checkpoints"
+  results_dir: "./results"
+  log_every: 10
+  save_every_epoch: false

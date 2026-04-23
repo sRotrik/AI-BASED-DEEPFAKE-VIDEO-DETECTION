@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeepGuard — AI Deepfake Detector</title>
+  <meta name="description" content="Detect deepfake videos instantly using a dual-stream ViT + TimeSformer AI model trained on FaceForensics++." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="page-wrapper">
+
+    <!-- ===== Header ===== -->
+    <header>
+      <a href="#" class="logo" aria-label="DeepGuard Home">
+        <div class="logo-icon">🛡️</div>
+        <span class="logo-text">Deep<span>Guard</span></span>
+      </a>
+      <div class="model-badge" id="model-badge">
+        <span class="dot"></span>
+        <span id="model-status-text">Loading model…</span>
+      </div>
+    </header>
+
+    <!-- ===== Main Content ===== -->
+    <main>
+
+      <!-- Hero -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-eyebrow">
+          <span>🤖</span> AI-Powered Detection
+        </div>
+        <h1 id="hero-title">
+          Is This Video<br />
+          <span class="grad">Real or Fake?</span>
+        </h1>
+        <p>
+          Upload any video. Our dual-stream Transformer model analyzes spatial
+          artifacts (ViT) and temporal inconsistencies (TimeSformer) to detect
+          deepfake manipulation with high accuracy.
+        </p>
+      </section>
+
+      <!-- Main Card -->
+      <section class="main-card" aria-label="Deepfake Analysis Tool">
+
+        <!-- Upload -->
+        <div class="upload-section">
+          <h2>Upload Video</h2>
+
+          <div
+            class="drop-zone"
+            id="drop-zone"
+            role="button"
+            tabindex="0"
+            aria-label="Click or drag a video file here"
+            aria-describedby="dz-sub"
+          >
+            <div class="dz-icon">🎬</div>
+            <div class="dz-title">Drag &amp; drop your video here</div>
+            <div class="dz-sub" id="dz-sub">Supports MP4, AVI, MOV, MKV · Max 200 MB</div>
+            <label class="dz-browse" for="file-input" id="browse-btn">Browse Files</label>
+          </div>
+
+          <input
+            type="file"
+            id="file-input"
+            accept="video/*"
+            aria-label="Select video file"
+          />
+
+          <!-- Video preview -->
+          <div class="video-preview-wrap" id="video-preview-wrap">
+            <video id="video-preview" controls preload="metadata"></video>
+            <button class="video-remove-btn" id="remove-btn" aria-label="Remove video">✕</button>
+            <div class="video-meta">
+              <span class="filename" id="video-filename"></span>
+              <span id="video-size"></span>
+            </div>
+          </div>
+
+          <!-- Analyze button -->
+          <button
+            class="analyze-btn"
+            id="analyze-btn"
+            disabled
+            aria-label="Analyze video for deepfake detection"
+          >
+            <div class="spinner" aria-hidden="true"></div>
+            <span class="btn-icon" aria-hidden="true">🔍</span>
+            <span id="btn-label">Analyze Video</span>
+          </button>
+        </div>
+
+        <!-- Results -->
+        <div class="result-section" aria-live="polite" aria-atomic="true">
+          <h2>Analysis Result</h2>
+
+          <!-- Placeholder -->
+          <div class="result-placeholder" id="result-placeholder" aria-label="Results will appear here">
+            <span class="ph-icon" aria-hidden="true">📊</span>
+            <span>Upload a video and click Analyze to see results</span>
+          </div>
+
+          <!-- Result Card -->
+          <div class="result-card" id="result-card">
+
+            <!-- Verdict -->
+            <div class="verdict-badge" id="verdict-badge">
+              <span class="verdict-emoji" id="verdict-emoji"></span>
+              <div>
+                <span id="verdict-label"></span>
+                <span class="verdict-sub" id="verdict-sub"></span>
+              </div>
+            </div>
+
+            <!-- Confidence Bars -->
+            <div class="confidence-grid">
+              <div class="conf-item">
+                <div class="conf-label">
+                  <span class="conf-name">✅ Real</span>
+                  <span class="conf-pct real" id="real-pct">0%</span>
+                </div>
+                <div class="conf-bar-track">
+                  <div class="conf-bar-fill real" id="real-bar"></div>
+                </div>
+              </div>
+              <div class="conf-item">
+                <div class="conf-label">
+                  <span class="conf-name">🚨 Fake</span>
+                  <span class="conf-pct fake" id="fake-pct">0%</span>
+                </div>
+                <div class="conf-bar-track">
+                  <div class="conf-bar-fill fake" id="fake-bar"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+              <div class="stat-chip">
+                <div class="s-label">Val AUC</div>
+                <div class="s-val" id="stat-auc">—</div>
+              </div>
+              <div class="stat-chip">
+                <div class="s-label">Threshold</div>
+                <div class="s-val" id="stat-thresh">—</div>
+              </div>
+              <div class="stat-chip">
+                <div class="s-label">Device</div>
+                <div class="s-val" id="stat-device">—</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Model Info Bar -->
+        <div class="model-info-bar">
+          <div class="info-pill">
+            <span class="ip-dot"></span>
+            <span>Model:</span>
+            <span class="ip-val">ViT-Base + TimeSformer-Base (CAT Fusion)</span>
+          </div>
+          <div class="info-pill">
+            <span class="ip-dot"></span>
+            <span>Dataset:</span>
+            <span class="ip-val">FaceForensics++ (6 methods)</span>
+          </div>
+          <div class="info-pill">
+            <span class="ip-dot"></span>
+            <span>Loss:</span>
+            <span class="ip-val">Focal + SupCon</span>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer>
+      <p>DeepGuard &mdash; Dual-Stream Deepfake Detection &middot; Built with ViT + TimeSformer &middot; Trained on FaceForensics++</p>
+    </footer>
+
+  </div><!-- /page-wrapper -->
+
+  <!-- Error Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive">
+    <span>⚠️</span>
+    <span id="toast-msg">An error occurred.</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

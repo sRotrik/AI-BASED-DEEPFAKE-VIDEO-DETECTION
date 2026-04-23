@@ -1,0 +1,7 @@
+# This folder contains model checkpoints (.pth files).
+# Checkpoint files are excluded from Git due to their large size (~1.5 GB each).
+#
+# To use this project, obtain best_model.pth separately and place it here:
+#   checkpoints/best_model.pth
+#
+# The checkpoint is saved by train.py automatically during training.

@@ -1,0 +1,20 @@
+{
+  "CAT + SupCon (Proposed)": {
+    "auc": 0.8385,
+    "bal_acc": 0.7433,
+    "f1": 0.8571,
+    "epochs": 30
+  },
+  "ViT Only": {
+    "auc": 0.7298,
+    "bal_acc": 0.6672,
+    "f1": 0.8071,
+    "epochs": 10
+  },
+  "TimeSformer Only (\u0394Frames)": {
+    "auc": 0.7498,
+    "bal_acc": 0.7032,
+    "f1": 0.7347,
+    "epochs": 10
+  }
+}
