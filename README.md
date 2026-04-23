@@ -64,12 +64,12 @@ Input Video
 
 | Metric | Value |
 |---|---|
-| **Validation AUC** | **0.8806** |
-| **Balanced Accuracy** | 0.78 |
-| **Optimal Threshold** | 0.5308 |
-| ViT alone (ablation) | ~0.74 AUC |
-| TimeSformer alone (ablation) | ~0.71 AUC |
-| **Combined (CAT Model)** | **0.8806 AUC** |
+| **Validation AUC** | **0.9094** |
+| **Balanced Accuracy** | 0.8306 |
+| **Optimal Threshold** | 0.815 |
+| ViT alone (ablation) | ~0.79 AUC |
+| TimeSformer alone (ablation) | ~0.76 AUC |
+| **Combined (CAT Model)** | **0.9094 AUC** |
 
 ### Per-Method AUC (FaceForensics++)
 The model is evaluated across all 6 manipulation methods:
