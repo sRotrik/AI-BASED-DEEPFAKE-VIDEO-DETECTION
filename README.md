@@ -2,86 +2,113 @@
 
 <div align="center">
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red?logo=pytorch)
-
-![License](https://img.shields.io/badge/License-MIT-green)
-![Val AUC](https://img.shields.io/badge/Val%20AUC-0.8806-brightgreen)
-
-
+![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red?style=for-the-badge&logo=pytorch)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Val AUC](https://img.shields.io/badge/Validation%20AUC-0.9094-brightgreen?style=for-the-badge)
 
 </div>
 
 ---
 
-## 🧠 Overview
+## 🧠 Project Overview
 
-This project presents a **dual-stream transformer-based deepfake video detection system** that simultaneously analyses **spatial** and **temporal** features to classify videos as real or manipulated.
+This repository contains the official implementation of our academic B.Tech project: **AI-Based Deepfake Video Detection**. The system employs a state-of-the-art **dual-stream transformer architecture** that captures both spatial visual artifacts and temporal inconsistencies to accurately classify a video as real or manipulated.
 
-Unlike single-frame approaches, our system:
-- Uses a **Vision Transformer (ViT-Base)** to detect frame-level visual anomalies
-- Uses a **TimeSformer** operating on **frame difference clips** to detect unnatural inter-frame motion
-- Employs **Supervised Contrastive Learning** to sharpen the separation between real and fake feature embeddings
-- Achieves a **Validation AUC of 0.8806** on FaceForensics++ across 6 manipulation methods
-
----
-
-## 🏗️ Architecture
-
-```
-Input Video
-    │
-    ├── MTCNN Face Detector
-    │
-    ├── 16+1 uniformly sampled face crops
-    │
-    ├────────────────────┬────────────────────────────────────
-    │                    │
-    │  SPATIAL STREAM    │  TEMPORAL STREAM
-    │                    │
-    │  Middle face frame │  Frame Differences
-    │  (C, H, W)        │  diff[t] = frame[t+1] - frame[t]
-    │                    │  (T=16, C, H, W)
-    │       ↓            │         ↓
-    │  ViT-Base          │  TimeSformer-Base
-    │  → 512-dim embed   │  → 512-dim embed
-    │                    │
-    └────────────────────┘
-              │
-        Concatenate → 1024-dim
-              │
-        LayerNorm → Linear → GELU → Dropout → Linear(2)
-              │
-       Softmax → [P(real), P(fake)]
-              │
-       FAKE if P(fake) ≥ 0.5308
-```
+Unlike conventional frame-by-frame CNN approaches, our solution:
+- Analyzes spatial anomalies using a **Vision Transformer (ViT-Base)**.
+- Detects unnatural inter-frame motion using a **TimeSformer** operating on frame difference clips.
+- Utilizes **Supervised Contrastive Learning (SupCon)** to pull embeddings of the same class closer together and push different classes apart, maximizing the decision boundary margin.
+- Exposes a sleek, dark-glassmorphism **Flask API/Web UI** for end users to easily drag-and-drop videos for real-time inference.
 
 ---
 
-## 📊 Results
+## 🏗️ System Architecture
 
+Our model processes 16 uniformly sampled frames per video face-crop. The architecture is split into two specialized streams that are concatenated before final classification.
+
+```mermaid
+graph TD
+    A[Input Video] --> B[MTCNN Face Detector]
+    B --> C[16+1 Uniform Face Crops]
+    
+    C -->|Spatial Stream| D[Middle Face Frame]
+    C -->|Temporal Stream| E[Frame Differences t+1 - t]
+    
+    D --> F[ViT-Base \n 512-dim embedding]
+    E --> G[TimeSformer-Base \n 512-dim embedding]
+    
+    F --> H((Concatenation))
+    G --> H
+    
+    H -->|1024-dim| I[LayerNorm + Linear]
+    I --> J[GELU + Dropout]
+    J --> K[Linear Projection]
+    K --> L{Softmax Classifier}
+    
+    L -->|P >= 0.815| M[🚨 FAKE]
+    L -->|P < 0.815| N[✅ REAL]
+    
+    style A fill:#2e2e2e,stroke:#fff
+    style M fill:#ff4d4d,stroke:#fff,color:#fff
+    style N fill:#4caf50,stroke:#fff,color:#fff
+```
+
+---
+
+## 📊 Final Output & Results
+
+The model has been rigorously evaluated on the **FaceForensics++** dataset across multiple manipulation methods. The metrics below reflect the peak validation performance using the combined (CAT) model.
+
+### Key Performance Metrics
 | Metric | Value |
-|---|---|
-| **Validation AUC** | **0.9094** |
-| **Balanced Accuracy** | 0.8306 |
-| **Optimal Threshold** | 0.815 |
-| ViT alone (ablation) | ~0.79 AUC |
-| TimeSformer alone (ablation) | ~0.76 AUC |
-| **Combined (CAT Model)** | **0.9094 AUC** |
+|:---|:---|
+| **Validation AUC** | **90.94%** |
+| **Average Precision (PR-AUC)** | 96.06% |
+| **Balanced Accuracy** | 83.06% |
+| **F1 Score** | 0.876 |
+| **Equal Error Rate (EER)** | 16.94% |
+| **Optimal Decision Threshold** | 0.815 |
 
-### Per-Method AUC (FaceForensics++)
-The model is evaluated across all 6 manipulation methods:
-`Deepfakes` | `Face2Face` | `FaceSwap` | `FaceShifter` | `NeuralTextures` | `DeepFakeDetection`
+### Confusion Matrix (at Optimal Threshold 0.815)
+| | Predicted REAL | Predicted FAKE |
+|:---|:---:|:---:|
+| **Actual REAL** | 64 (TN) | 13 (FP) |
+| **Actual FAKE** | 34 (FN) | 166 (TP) |
 
-See [`results/per_method_auc.png`](results/per_method_auc.png) and [`results/metrics.json`](results/metrics.json) for full breakdown.
+### Performance by Manipulation Method (AUC)
+The system is highly robust across various deepfake generation techniques:
+
+| Manipulation Method | Validation AUC |
+|:---|:---|
+| **DeepFakeDetection** | 99.15% |
+| **Deepfakes** | 96.10% |
+| **Face2Face** | 90.39% |
+| **FaceSwap** | 89.35% |
+| **FaceShifter** | 88.55% |
+| **NeuralTextures** | 83.70% |
+
+> *Note: Evaluation figures including ROC curves, PR curves, and t-SNE embedding visualizations are available in the `results/` directory.*
 
 ---
 
-## 📁 Project Structure
+## 💻 Tech Stack
 
-```
-deepfake_detection/
+- **Deep Learning Framework:** PyTorch 2.0+
+- **Model Backbones:** HuggingFace `transformers` (ViT, TimeSformer)
+- **Face Detection:** `facenet-pytorch` (MTCNN)
+- **Backend API:** Flask, Flask-CORS
+- **Frontend UI:** HTML5, CSS3 (Vanilla Glassmorphism), JavaScript
+- **Data Augmentation:** `albumentations`
+- **Data Processing:** OpenCV (`opencv-python-headless`), NumPy
+- **Evaluation:** Scikit-Learn, Matplotlib, Seaborn
+
+---
+
+## 📁 Project Directory Structure
+
+```text
+AI-BASED-DEEPFAKE-VIDEO-DETECTION/
 │
 ├── models/
 │   ├── cat_model.py          # CATModel + CATModelWithSupCon + FocalLoss + SupConLoss
@@ -90,41 +117,32 @@ deepfake_detection/
 │   └── supcon_loss.py        # Supervised Contrastive Loss
 │
 ├── data/
-│   ├── dataset.py            # FaceForensicsDataset — dual-stream (frame + diff clip)
+│   ├── dataset.py            # FaceForensicsDataset — dual-stream handler
 │   ├── preprocess.py         # MTCNN face extraction → .npy files
-│   └── processed/
-│       └── records.json      # Dataset metadata (paths, labels, method sources)
+│   └── processed/            # Dataset metadata (records.json)
 │
 ├── configs/
-│   └── config.yaml           # All hyperparameters
+│   └── config.yaml           # Centralized hyperparameters
 │
-├── static/                   # Web UI (HTML/CSS/JS — dark glassmorphism)
+├── static/                   # Frontend Web UI (Dark Glassmorphism)
 │   ├── index.html
 │   ├── style.css
 │   └── script.js
 │
-├── results/                  # Evaluation figures and metrics
-│   ├── metrics.json
-│   ├── roc_curve.png
-│   ├── confusion_matrix.png
-│   ├── tsne.png
-│   ├── pr_curve.png
-│   ├── score_distribution.png
-│   └── per_method_auc.png
+├── results/                  # Evaluation figures and serialized metrics
+│   ├── metrics.json          # Complete evaluation statistics
+│   └── *.png                 # ROC, PR, t-SNE plots
 │
-├── checkpoints/              # Model checkpoints (not tracked by Git — see below)
-│   └── last_checkpoint.txt
+├── checkpoints/              # Directory for model weights
 │
 ├── train.py                  # Full training loop (resume-capable)
-├── evaluate.py               # Full evaluation + publication-quality figures
+├── evaluate.py               # Full evaluation script
 ├── inference.py              # CLI single-video inference
-├── demo.py                   # Gradio web demo (localhost:7860)
+├── demo.py                   # Gradio web demo
 ├── app.py                    # Flask REST API backend
-├── requirements.txt
-└── .gitignore
+├── diagnose.py               # Debugging & validation script
+└── requirements.txt
 ```
-
-> ⚠️ **Model checkpoints (`best_model.pth`, ~1.5 GB) and the FaceForensics++ dataset are NOT included in this repository** due to size constraints. See the **Setup** section below.
 
 ---
 
@@ -136,12 +154,13 @@ git clone https://github.com/sRotrik/AI-BASED-DEEPFAKE-VIDEO-DETECTION.git
 cd AI-BASED-DEEPFAKE-VIDEO-DETECTION
 ```
 
-### 2. Create Virtual Environment
+### 2. Environment Setup
 ```bash
 python -m venv venv
-# Windows
+
+# On Windows:
 venv\Scripts\activate
-# Linux/Mac
+# On macOS/Linux:
 source venv/bin/activate
 ```
 
@@ -149,142 +168,69 @@ source venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+*(Ensure you have the correct PyTorch version for your CUDA toolkit, e.g., `--index-url https://download.pytorch.org/whl/cu121`)*
 
-For CUDA 12.1:
-```bash
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-```
-
-### 4. Download Pre-trained Model Checkpoint
-> The `best_model.pth` file is not in the repository. Download it separately and place at:
-```
-checkpoints/best_model.pth
-```
-
-### 5. Configure `configs/config.yaml`
-Update `data.root_dir` to point to your local FaceForensics++ dataset path.
+### 4. Download Model Weights
+Due to file size constraints, the best checkpoint (`best_model.pth`) is **not** included in the repository. Please download it from the project releases page and place it in the `checkpoints/` directory.
 
 ---
 
-## 🚀 Usage
+## 🚀 Usage Guide
 
-### Command-Line Inference (Single Video)
-```bash
-python inference.py --video path/to/video.mp4
-# With face grid visualization:
-python inference.py --video path/to/video.mp4 --show_frames
-```
-
-**Example output:**
-```
-=======================================================
-  Video      : sample.mp4
-  P(real)    : 0.1243  (12.4%)
-  P(fake)    : 0.8757  (87.6%)
-  Threshold  : 0.5308
-  🚨 Verdict : FAKE  (87.6% confident)
-  Latency    : 843.2 ms
-  REAL [████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] FAKE
-=======================================================
-```
-
-### Gradio Web Demo
-```bash
-python demo.py
-# Opens at http://localhost:7860
-```
-
-### Flask Web Application (Full UI)
+### 1. Web UI Dashboard (Flask)
+For a premium, interactive experience, start the Flask web server:
 ```bash
 python app.py
-# Opens at http://127.0.0.1:5000
+```
+Open your browser and navigate to `http://127.0.0.1:5000`. You can drag-and-drop videos directly into the UI to get real-time detection results, complete with confidence scores and verdict visualizations.
+
+### 2. Command-Line Inference
+To quickly test a single video via the terminal:
+```bash
+python inference.py --video path/to/sample.mp4
 ```
 
-### Training From Scratch
+### 3. Training the Model
+To reproduce the training process from scratch:
 ```bash
-# First preprocess the dataset:
+# 1. Preprocess the dataset to extract faces
 python data/preprocess.py
 
-# Then train:
+# 2. Start training
 python train.py
-
-# Resume from checkpoint:
-python train.py --resume
 ```
 
-### Evaluation
+### 4. Diagnostics & Debugging
+If you encounter data loading or model forward-pass issues, run the diagnostic script:
 ```bash
-python evaluate.py
-# Generates all figures in results/ folder
+python diagnose.py
 ```
 
 ---
 
-## 🧪 Key Technical Decisions
-
-| Design Choice | Rationale |
-|---|---|
-| **Frame differences → TimeSformer** | Forces temporal stream to detect change artefacts, not natural motion |
-| **Differential LRs** (backbone: 1e-5, head: 1e-4) | Prevents catastrophic forgetting of pre-trained ViT/TimeSformer weights |
-| **Focal Loss (α=0.75)** | Handles 1:6 real:fake class imbalance |
-| **SupCon Loss (τ=0.15)** | Tightens embedding clusters — reduces false positives on ambiguous samples |
-| **Linear Warmup → CosineDecay** | Replaced OneCycleLR (caused LR spikes and classifier explosion) |
-| **16 frames / video** | Standardises input shape; balances temporal coverage vs. compute cost |
-
----
-
-## 📈 Evaluation Figures
-
-| Figure | Description |
-|---|---|
-| [`roc_curve.png`](results/roc_curve.png) | ROC Curve — AUC 0.8806 |
-| [`confusion_matrix.png`](results/confusion_matrix.png) | Confusion matrix at threshold 0.5308 |
-| [`tsne.png`](results/tsne.png) | t-SNE embedding visualization (real vs fake clusters) |
-| [`pr_curve.png`](results/pr_curve.png) | Precision-Recall Curve |
-| [`score_distribution.png`](results/score_distribution.png) | P(fake) score distribution for real and fake samples |
-| [`per_method_auc.png`](results/per_method_auc.png) | Per-method AUC across all 6 FF++ manipulation types |
-
----
-
-## 📦 Dependencies
-
-Key libraries:
-- `torch >= 2.0.0` — model training and inference
-- `transformers >= 4.35.0` — ViT and TimeSformer pretrained models
-- `facenet-pytorch >= 2.5.3` — MTCNN face detection
-- `albumentations >= 1.3.1` — image augmentation pipeline
-- `opencv-python-headless >= 4.8.0` — video frame extraction
-- `flask`, `flask-cors` — REST API backend
-- `gradio` — web demo interface
-- `scikit-learn`, `matplotlib`, `seaborn` — evaluation and plotting
-
-See [`requirements.txt`](requirements.txt) for the full list.
-
----
-
-## 👥 Team
+## 👥 Project Team
 
 | Name | Register No. | Role | Email |
-|---|---|---|---|
+|:---|:---|:---|:---|
 | **Reshma K** | RA2311003011843 | Data pipeline, SupCon loss, Evaluation | rk6362@srmist.edu.in |
 | **Srotrik Pradhan** | RA2311003011860 | Model architecture, Training infra, Web app | sp8087@srmist.edu.in |
 
-**Supervisor:** Dr. Shyni Shajahan | Assistant Professor, CTECH Dept.  
-SRM Institute of Science and Technology, Kattankulathur — 603203
+**Academic Supervisor:** Dr. Shyni Shajahan (Assistant Professor, CTECH Dept.)  
+*SRM Institute of Science and Technology, Kattankulathur — 603203*
 
 ---
 
 ## 📄 License
 
 This project is developed for academic purposes under SRM IST (Course 21CSP302L).  
-Code is released under the [MIT License](LICENSE).
+Source code is released under the [MIT License](LICENSE).
 
 ---
 
-## 🔗 References
+## 🔗 Key References
 
-- FaceForensics++: [Rössler et al., ICCV 2019](https://github.com/ondyari/FaceForensics)
-- Vision Transformer: [Dosovitskiy et al., ICLR 2021](https://arxiv.org/abs/2010.11929)
-- TimeSformer: [Bertasius et al., ICML 2021](https://arxiv.org/abs/2102.05095)
-- Supervised Contrastive Learning: [Khosla et al., NeurIPS 2020](https://arxiv.org/abs/2004.11362)
-- MTCNN: [Zhang et al., IEEE Signal Processing Letters 2016](https://arxiv.org/abs/1604.02878)
+1. **FaceForensics++:** [Rössler et al., ICCV 2019](https://github.com/ondyari/FaceForensics)
+2. **Vision Transformer:** [Dosovitskiy et al., ICLR 2021](https://arxiv.org/abs/2010.11929)
+3. **TimeSformer:** [Bertasius et al., ICML 2021](https://arxiv.org/abs/2102.05095)
+4. **Supervised Contrastive Learning:** [Khosla et al., NeurIPS 2020](https://arxiv.org/abs/2004.11362)
+5. **MTCNN:** [Zhang et al., IEEE Signal Processing Letters 2016](https://arxiv.org/abs/1604.02878)
