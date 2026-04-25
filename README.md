@@ -23,6 +23,17 @@ Unlike conventional frame-by-frame CNN approaches, our solution:
 
 ---
 
+## 🔬 Core AI Components (CAT Architecture)
+
+Our system achieves its high detection accuracy through a **CAT (Concatenation) Architecture** that unites these advanced mechanisms:
+
+1. **ViT (Vision Transformer)**: The spatial stream that acts as a robust backbone for extracting highly granular visual artifacts (e.g., face blending boundaries, artificial textures) from individual frames.
+2. **TimeSformer**: The temporal stream designed to compute self-attention across frame-differences, pinpointing unnatural inter-frame motion, flickering, or micro-expressions over time.
+3. **CAT (Concatenated Fusion)**: The late-fusion mechanism where the 512-dim embeddings from both ViT and TimeSformer are effectively concatenated into a unified 1024-dim representation before the classification head.
+4. **SupCon (Supervised Contrastive Learning)**: During training, we apply a specialized SupCon loss. Instead of relying purely on Cross-Entropy, SupCon actively tightens the cluster of 'Real' videos and forcefully pushes away the 'Fake' videos in the embedding space, drastically reducing false positives.
+
+---
+
 ## 🏗️ System Architecture
 
 Our model processes 16 uniformly sampled frames per video face-crop. The architecture is split into two specialized streams that are concatenated before final classification.
