@@ -88,7 +88,17 @@ The system is highly robust across various deepfake generation techniques:
 | **FaceShifter** | 88.55% |
 | **NeuralTextures** | 83.70% |
 
-> *Note: Evaluation figures including ROC curves, PR curves, and t-SNE embedding visualizations are available in the `results/` directory.*
+> *Note: Full evaluation figures and embedding visualizations are generated in the `results/` directory.*
+
+### 📈 Evaluation Figures
+
+| ROC Curve | Precision-Recall Curve |
+|:---:|:---:|
+| <img src="results/roc_curve.png" width="400"/> | <img src="results/pr_curve.png" width="400"/> |
+| **Confusion Matrix** | **Score Distribution** |
+| <img src="results/confusion_matrix.png" width="400"/> | <img src="results/score_distribution.png" width="400"/> |
+| **Per-Method AUC** | **t-SNE Embeddings** |
+| <img src="results/per_method_auc.png" width="400"/> | <img src="results/tsne.png" width="400"/> |
 
 ---
 
